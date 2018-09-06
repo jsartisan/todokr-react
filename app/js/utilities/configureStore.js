@@ -1,5 +1,7 @@
-import { createStore } from 'redux';
+import { createStore, compose, applyMiddleware } from 'redux';
 import throttle from 'lodash/throttle';
+import { createLogger } from 'redux-logger';
+import thunk from 'redux-thunk';
 import reducers from './../reducers';
 
 /**
@@ -8,57 +10,16 @@ import reducers from './../reducers';
  * @param  {[type]} store [description]
  * @return {[type]}       [description]
  */
-const logger = (store) => (next) => {
-  if(!console.group) {
-    return next;
-  }
 
-  return (action) => {
-    console.group(action.type);
-    console.log('%c prev state', 'color: gray', store.getState());
-    console.log('action', action);
-
-    const returnValue = next(action);
-    console.log('%c next state', 'color: green', store.getState());
-    console.groupEnd(action.type);
-
-    return returnValue;
-  }
-}
-
-/**
- * thunk middleware
- * 
- * @param  {[type]} store [description]
- * @return {[type]}       [description]
- */
-const thunk = (store) => (next) => (action) => {
-  if(typeof action === 'function') {
-    return action(store.dispatch, store.getState);
-  }
-
-  return next(action);
-}
-
-/**
- * wraps dispatch with middleware chain
- * 
- * @param  {[type]} store       [description]
- * @param  {[type]} middlewares [description]
- * @return {[type]}             [description]
- */
-const wrapDispatchWithMiddlewares = (store, middlewares) => {
-  middlewares.slice().reverse().forEach(middleware => 
-    store.dispatch = middleware(store)(store.dispatch)
-  );
-};
+const logger = createLogger();
 
 const configureStore = () => {
-  
-  const store = createStore(
-    reducers,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-  );
+
+  const composeEnhancers =
+    typeof window === 'object' &&
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ :
+      compose;
 
   const middlewares = [thunk];
 
@@ -66,8 +27,11 @@ const configureStore = () => {
     middlewares.push(logger);
   }
 
-  wrapDispatchWithMiddlewares(store, middlewares);
-
+  const store = createStore(
+    reducers,
+    composeEnhancers(applyMiddleware(...middlewares)),
+  );
+  
   return store;
 };
 
