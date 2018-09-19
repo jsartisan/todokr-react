@@ -23,7 +23,9 @@ const list = () => {
     const ids = (state = [], action) => {
       switch (action.type) {
         case types.FETCH_TODOS_SUCCESS:
-          return action.result;
+        return filter === action.filter ?
+          action.result :
+          state;
         case types.ADD_TODO_SUCCESS:
           return filter !== 'completed' ?
           [...state, action.result] :
@@ -93,9 +95,7 @@ export default combineReducers({
  *  add todo
  */
 export const addTodo = (state, action) => {
-  const { todo } = action;
-
-  return state;
+  const { result: todo } = action;
 
   return {
     ...state,
@@ -109,9 +109,7 @@ export const addTodo = (state, action) => {
  * toggle todo
  */
 export const toggleTodo = (state, action) => {
-  const { todo } = action;
-
-  return state;
+  const { result: todo } = action;
 
   return {
     ...state,

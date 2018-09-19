@@ -18,11 +18,12 @@ export const addTodo = (text) => (dispatch) => {
 
 export const toggleTodo = (id) => (dispatch) => {
   return api.toggleTodo(id).then(response => {
-    const { entities } = normalize(response, todoSchema);
+    const { entities, result } = normalize(response, todoSchema);
 
     dispatch({
       type: types.TOGGLE_TODO_SUCCESS,
       entities,
+      result,
       response
     });
   })
