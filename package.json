@@ -1,5 +1,5 @@
 {
-  "name": "Todo",
+  "name": "Todokr",
   "version": "0.0.0",
   "description": "Todo app using React, Redux and Webpack. Based on the example from Dan Abramov's excellent tutorial (https://egghead.io/series/getting-started-with-redux)",
   "scripts": {
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "babel-preset-env": "^1.7.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "node-uuid": "^1.4.8",
     "normalizr": "^3.2.4",
     "react": "^0.14.5",
@@ -37,6 +37,7 @@
     "redux": "^3.0.5",
     "redux-logger": "^3.0.6",
     "redux-promise": "^0.6.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "reselect": "^3.0.1"
   }
 }

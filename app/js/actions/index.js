@@ -1,51 +1,71 @@
-import { normalize } from 'normalizr'; 
-import * as schema from './schema';
+import { normalize } from 'normalizr';
+import { arrayOfTodos, todo as todoSchema } from './../constants/Schemas';
 import * as api from '../api';
-import { getIsFetching } from '../reducers';
+import * as types from '../constants/ActionTypes';
 
 export const addTodo = (text) => (dispatch) => {
   return api.addTodo(text).then(response => {
+    const { entities, result } = normalize(response, todoSchema);
+
     dispatch({
-      type: 'ADD_TODO_SUCCESS',
-      response: normalize(response, schema.todo)
+      type: types.ADD_TODO_SUCCESS,
+      entities,
+      response,
+      result
     });
   });
 }
 
 export const toggleTodo = (id) => (dispatch) => {
   return api.toggleTodo(id).then(response => {
+    const { entities } = normalize(response, todoSchema);
+
     dispatch({
-      type: 'TOGGLE_TODO_SUCCESS',
-      response: normalize(response, schema.todo)
+      type: types.TOGGLE_TODO_SUCCESS,
+      entities,
+      response
     });
   })
 }
 
+export const fetchTodosRequest = (filter) => (dispatch) => {
+  dispatch({
+    type: types.FETCH_TODOS_REQUEST,
+    filter,
+  });
+}
+
+const fetchTodosSuccess = (filter, result, entities) => (dispatch) => {
+  dispatch({
+    type: types.FETCH_TODOS_SUCCESS,
+    result,
+    entities,
+    filter,
+  });
+};
+
+const fetchTodosError = (filter, message) => (dispatch) => {
+  dispatch({
+    type: types.FETCH_TODOS_ERROR,
+    filter,
+    message,
+  });
+}
 
 export const fetchTodos = (filter) => (dispatch, getState) => {
-  if(getIsFetching(getState(), filter) === true) {
-    return Promise.resolve();
-  }
-
-  dispatch({
-    type: 'FETCH_TODOS_REQUEST',
-    filter
-  });
+  dispatch(fetchTodosRequest(filter));
 
   return api.fetchTodos(filter).then(
     response => {
-      dispatch({
-        type: 'FETCH_TODOS_SUCCESS',
-        filter,
-        response: normalize(response, schema.arrayOfTodos)
-      });
+      const { entities, result } = normalize(response, arrayOfTodos);
+
+      dispatch(fetchTodosSuccess(filter, result, entities));
+
+      return response;
     },
     error => {
-      dispatch({
-        type: 'FETCH_TODOS_FAILURE',
-        filter,
-        message: error.message || 'Something went wrong'
-      })
+      const message = error.message || 'Something went wrong';
+      dispatch(fetchTodosError(filter, message));
     }
   );
 };

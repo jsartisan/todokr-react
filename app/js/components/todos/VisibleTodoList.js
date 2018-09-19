@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
-import { getVisibleTodos, getIsFetching, getErrorMessage } from '../reducers';
-import * as actions from '../actions';
+import { getTodosIsFetching, getTodos, getTodosErrorMessage } from './../../selectors/TodoSelectors';
+import * as actions from '../../actions';
 import TodoList from './TodoList';
-import FetchError from './FetchError';
+import FetchError from './../common/FetchError';
 
 class VisibleTodoList extends Component {
   componentDidMount() {
@@ -50,13 +50,13 @@ const mapStateToProps = (state, ownProps) => {
   const filter = ownProps.match.params.filter || 'all';
 
   return {
-    todos: getVisibleTodos(state, filter),
+    todos: getTodos(state, filter),
     filter,
-    errorMessage: getErrorMessage(state, filter),
-    isFetching: getIsFetching(state, filter)
+    errorMessage: getTodosErrorMessage(state, filter),
+    isFetching: getTodosIsFetching(state, filter)
   }
 };
-  
+
 export default withRouter(
   connect(
     mapStateToProps, actions
